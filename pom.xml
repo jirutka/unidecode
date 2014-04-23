@@ -1,55 +1,79 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>me.xuender</groupId>
-  <artifactId>unidecode</artifactId>
-  <version>0.0.7-SNAPSHOT</version>
-  <packaging>jar</packaging>
-  <description>ASCII transliterations of Unicode text for Java</description>
-  <parent>
-    <groupId>org.sonatype.oss</groupId>
-    <artifactId>oss-parent</artifactId>
-    <version>7</version>
-  </parent>
-  <developers>
-    <developer>
-      <id>ender</id>
-      <name>徐晨阳</name>
-      <email>xuender@gmail.com</email>
-      <organization>ender</organization>
-      <organizationUrl>http://xuender.me</organizationUrl>
-    </developer>
-  </developers>
-  <issueManagement>
-    <system>Github Issue</system>
-    <url>https://github.com/xuender/unidecode/issues</url>
-  </issueManagement>
-  <scm>
-    <url>git@github.com:xuender/unidecode.git</url>
-    <connection>scm:git:git@github.com:xuender/unidecode.git</connection>
-    <developerConnection>scm:git:git@github.com:xuender/unidecode.git</developerConnection>
-  </scm>
-  <licenses>
-    <license>
-      <name>The Apache Software License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.11</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
-  <name>unidecode</name>
-  <url>https://github.com/xuender/unidecode</url>
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
-    <maven.compiler.source>1.6</maven.compiler.source>
-    <maven.compiler.target>1.6</maven.compiler.target>
-    <maven.compiler.compilerVersion>1.6</maven.compiler.compilerVersion>
-  </properties>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>cz.jirutka.maven</groupId>
+        <artifactId>root-parent</artifactId>
+        <version>1.1.4</version>
+    </parent>
+
+
+    <!--//////////////////// ABOUT ////////////////////-->
+
+    <groupId>cz.jirutka.unidecode</groupId>
+    <artifactId>unidecode</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>unidecode</name>
+    <description>Transliteration from Unicode to ASCII or ISO 8859-2.</description>
+    <url>http://github.com/jirutka/unidecode</url>
+
+    <developers>
+        <developer>
+            <name>Jakub Jirutka</name>
+            <email>jakub@jirutka.cz</email>
+            <organization>CTU in Prague</organization>
+            <organizationUrl>http://www.cvut.cz</organizationUrl>
+        </developer>
+        <!-- Originally developed by 徐晨阳 <xuender@gmail.com> -->
+    </developers>
+
+
+    <!--//////////////////// DISTRIBUTION ////////////////////-->
+
+    <licenses>
+        <license>
+            <name>Apache License 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>git@github.com:jirutka/unidecode.git</url>
+        <connection>scm:git:git@github.com:jirutka/unidecode.git</connection>
+    </scm>
+
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/jirutka/unidecode/issues</url>
+    </issueManagement>
+
+    <ciManagement>
+        <system>travis</system>
+        <url>https://travis-ci.org/jirutka/unidecode</url>
+    </ciManagement>
+
+
+    <!--//////////////////// PROPERTIES ////////////////////-->
+
+    <properties>
+        <java.source.version>1.6</java.source.version>
+    </properties>
+
+
+    <!--//////////////////// DEPENDENCIES ////////////////////-->
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 </project>
