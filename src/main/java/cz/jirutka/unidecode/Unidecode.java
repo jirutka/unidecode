@@ -1,7 +1,7 @@
 /**
  *
  */
-package me.xuender.unidecode;
+package cz.jirutka.unidecode;
 
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -1,10 +1,11 @@
 /**
  *
  */
-package me.xuender.unidecode;
+package cz.jirutka.unidecode;
 
 import static org.junit.Assert.*;
 
+import cz.jirutka.unidecode.Unidecode;
 import org.junit.AfterClass;
 import org.junit.Test;
 
@@ -23,7 +24,7 @@ public class UnidecodeTest {
 
     /**
      * Test method for
-     * {@link me.xuender.unidecode.Unidecode#decode(java.lang.String)}.
+     * {@link cz.jirutka.unidecode.Unidecode#decode(java.lang.String)}.
      */
     @Test
     public void testDecode() {
@@ -36,7 +37,7 @@ public class UnidecodeTest {
 
     /**
      * Test method for
-     * {@link me.xuender.unidecode.Unidecode#decode(java.lang.String)}.
+     * {@link cz.jirutka.unidecode.Unidecode#decode(java.lang.String)}.
      */
     @Test
     public void testDecodeException() {
@@ -46,7 +47,7 @@ public class UnidecodeTest {
 
     /**
      * Test method for
-     * {@link me.xuender.unidecode.Unidecode#initials(java.lang.String)}.
+     * {@link cz.jirutka.unidecode.Unidecode#initials(java.lang.String)}.
      */
     @Test
     public void testInitials() {
@@ -60,7 +61,7 @@ public class UnidecodeTest {
 
     /**
      * Test method for
-     * {@link me.xuender.unidecode.Unidecode#initials(java.lang.String)}.
+     * {@link cz.jirutka.unidecode.Unidecode#initials(java.lang.String)}.
      */
     @Test
     public void testInitialsException() {
