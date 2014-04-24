@@ -23,20 +23,103 @@ import spock.lang.Unroll
 class UnidecodeTest extends Specification {
 
     def udAscii = Unidecode.withCharset('ASCII')
+    def udLatin2 = Unidecode.withCharset('ISO-8859-2')
     
-    def 'convert to ASCII: #input'() {
+    
+    def 'handle null and empty string'() {
+        expect:
+            udAscii.decode(input) == ''
+        where:
+            input << [null, '']
+    }
+    
+    def 'convert example text to ASCII: #input'() {
         expect:
             udAscii.decode(input) == expected
         where:
-            input           | expected
-            ''              | ''
-            null            | ''
-            'Hello world.'  | 'Hello world.'
-            '南无阿弥陀佛'    | 'Nan Wu A Mi Tuo Fo'
-            'Κνωσός'       | 'Knosos'
-            'あみだにょらい'  | 'amidaniyorai'
-            '一条会走路的鱼'  | 'Yi Tiao Hui Zou Lu De Yu'
+            input                                        | expected
+            ''                                           | ''
+            null                                         | ''
+            'The quick brown fox jumps over a lazy dog.' | 'The quick brown fox jumps over a lazy dog.'
+            'Příšerně žluťoučký kůň úpěl ďábelské ódy.'  | 'Priserne zlutoucky kun upel dabelske ody.'
+            '"Fix, Schwyz!" quäkt Jürgen blöd vom Paß'   | '"Fix, Schwyz!" quakt Jurgen blod vom Pass'
+            '南无阿弥陀佛'                                 | 'Nan Wu A Mi Tuo Fo'
+            'Κνωσός'                                    | 'Knosos'
+            'あみだにょらい'                               | 'amidaniyorai'
+            '一条会走路的鱼'                               | 'Yi Tiao Hui Zou Lu De Yu'
     }
+    
+    def 'convert quotation marks to ASCII: #desc'() {
+        expect:
+            udAscii.decode(input) == expected
+        where:
+            input | expected | desc
+            '„“'  | '""'     | 'czech double'
+            '‚‘'  | "''"     | 'czech single'
+            '“”'  | '""'     | 'english double'
+            '‘’'  | "''"     | 'english single'
+            '»«'  | '>><<'   | 'french'
+    }
+    
+    def 'convert hyphens/dashes to ASCII: #desc'() {
+        expect:
+            udAscii.decode(input) == expected
+        where:
+            input | expected | desc
+            '-'   | '-'      | 'hyphen-minus'
+            '‑'   | '-'      | 'non-breaking hyphen'
+            '⁃'   | '--'     | 'hyphen bullet'
+            '‒'   | '-'      | 'figure dash'
+            '–'   | '-'      | 'en-dash'
+            '—'   | '--'     | 'em-dash'
+            '―'   | '--'     | 'horizontal bar'
+    }
+    
+    def 'convert ellipsis to ASCII: #desc'() {
+        expect:
+            udAscii.decode(input) == expected
+        where:
+            input | expected | desc
+            '…'   | '...'    | 'normal'
+            '…'   | '...'    | 'precomposed'
+    }
+    
+    def 'convert math symbols to ASCII: #desc'() {
+        expect:
+            udAscii.decode(input) == expected
+        where:
+            input | expected | desc
+            '≠'   | '!='     | 'not equal'
+            '≥'   | '>='     | 'greater than or equal'
+            '≤'   | '<='     | 'less than or equal'
+            '÷'   | '/'      | 'obelus' 
+    }
+
+
+    def 'preserve diacritic chars in Latin-2: #input'() {
+        expect:
+            udLatin2.decode(input) == input
+        where:
+            input << [
+                'Příšerně žluťoučký kůň úpěl ďábelské ódy.',
+                '"Fix, Schwyz!" quäkt Jürgen blöd vom Paß'
+            ]
+    }
+    
+    def 'preserve some special chars in Latin-2: #desc'() {
+        expect:
+            udLatin2.decode(input) == input
+        where:
+            input | desc
+            ' '   | 'non-breakable space'
+            '˘'   | 'breve'
+            '¤'   | 'currency sign'
+            '§'   | 'section sign'
+            '°'   | 'degree symbol'
+            '÷'   | 'obelus'
+            // this is not complete, just some common examples
+    }
+    
     
     def 'convert to initials in ASCII'() {
         expect:
