@@ -6,7 +6,7 @@
 
     <parent>
         <groupId>cz.jirutka.maven</groupId>
-        <artifactId>root-parent</artifactId>
+        <artifactId>groovy-parent</artifactId>
         <version>1.1.4</version>
     </parent>
 
@@ -63,9 +63,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.11</version>
+            <groupId>org.spockframework</groupId>
+            <artifactId>spock-core</artifactId>
+            <version>${spock.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
