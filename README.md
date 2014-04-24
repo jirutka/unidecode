@@ -1,6 +1,8 @@
 Unidecode
 =========
 [![Build Status](https://travis-ci.org/jirutka/unidecode.svg)](https://travis-ci.org/jirutka/unidecode)
+[![Coverage Status](https://img.shields.io/coveralls/jirutka/unidecode.svg)](https://coveralls.io/r/jirutka/unidecode)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/cz.jirutka.unidecode/unidecode/badge.svg)](https://maven-badges.herokuapp.com/maven-central/cz.jirutka.unidecode/unidecode)
 
 Unidecode is a Java port of the [Text::Unidecode](http://search.cpan.org/~sburke/Text-Unidecode/lib/Text/Unidecode.pm)
 from Perl that solves transliteration of an Unicode text to US-ASCII. However, this implementation is not limited only
