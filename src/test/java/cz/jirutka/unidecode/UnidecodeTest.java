@@ -3,11 +3,10 @@
  */
 package cz.jirutka.unidecode;
 
-import static org.junit.Assert.*;
-
-import cz.jirutka.unidecode.Unidecode;
-import org.junit.AfterClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 /**
  * @author <a href="mailto:xuender@gmail.com">ender</a>
@@ -15,58 +14,37 @@ import org.junit.Test;
  */
 public class UnidecodeTest {
 
-    /**
-     * @throws java.lang.Exception
-     */
-    @AfterClass
-    public static void tearDownAfterClass() throws Exception {
-    }
+    Unidecode unidecode = Unidecode.withCharset("ASCII");
 
-    /**
-     * Test method for
-     * {@link cz.jirutka.unidecode.Unidecode#decode(java.lang.String)}.
-     */
     @Test
     public void testDecode() {
         assertEquals("hello world", "Hello world.",
-                Unidecode.decode("Hello world."));
-        assertEquals("南无阿弥陀佛", "Nan Wu A Mi Tuo Fo", Unidecode.decode("南无阿弥陀佛"));
-        assertEquals("Κνωσός", "Knosos", Unidecode.decode("Κνωσός"));
-        assertEquals("あみだにょらい", "amidaniyorai", Unidecode.decode("あみだにょらい"));
+                unidecode.decode("Hello world."));
+        assertEquals("南无阿弥陀佛", "Nan Wu A Mi Tuo Fo", unidecode.decode("南无阿弥陀佛"));
+        assertEquals("Κνωσός", "Knosos", unidecode.decode("Κνωσός"));
+        assertEquals("あみだにょらい", "amidaniyorai", unidecode.decode("あみだにょらい"));
     }
 
-    /**
-     * Test method for
-     * {@link cz.jirutka.unidecode.Unidecode#decode(java.lang.String)}.
-     */
     @Test
     public void testDecodeException() {
-        assertEquals("", "", Unidecode.decode(""));
-        assertEquals("NULL", "", Unidecode.decode(null));
+        assertEquals("", "", unidecode.decode(""));
+        assertEquals("NULL", "", unidecode.decode(null));
     }
 
-    /**
-     * Test method for
-     * {@link cz.jirutka.unidecode.Unidecode#initials(java.lang.String)}.
-     */
     @Test
     public void testInitials() {
-        assertEquals("hello world", "Hw", Unidecode.initials("Hello world."));
-        assertEquals("南无阿弥陀佛", "NWAMTF", Unidecode.initials("南无阿弥陀佛"));
-        assertEquals("Κνωσός", "K", Unidecode.initials("Κνωσός"));
-        assertEquals("あみだにょらい", "a", Unidecode.initials("あみだにょらい"));
+        assertEquals("hello world", "Hw", unidecode.toInitials("Hello world."));
+        assertEquals("南无阿弥陀佛", "NWAMTF", unidecode.toInitials("南无阿弥陀佛"));
+        assertEquals("Κνωσός", "K", unidecode.toInitials("Κνωσός"));
+        assertEquals("あみだにょらい", "a", unidecode.toInitials("あみだにょらい"));
         assertEquals("enter", "XXGN\nQZQC\n\rTZHL\tSSC",
-                Unidecode.initials("小小姑娘\n清早起床\n\r提着花篮\t上市场。"));
+                unidecode.toInitials("小小姑娘\n清早起床\n\r提着花篮\t上市场。"));
     }
 
-    /**
-     * Test method for
-     * {@link cz.jirutka.unidecode.Unidecode#initials(java.lang.String)}.
-     */
     @Test
     public void testInitialsException() {
-        assertEquals("", "", Unidecode.initials(""));
-        assertEquals("NULL", "", Unidecode.initials(null));
+        assertEquals("", "", unidecode.toInitials(""));
+        assertEquals("NULL", "", unidecode.toInitials(null));
     }
 
     /**
@@ -79,7 +57,7 @@ public class UnidecodeTest {
     @Test
     public void testDecodeYi() {
         assertEquals("何清宝提出的bug", "Yi Tiao Hui Zou Lu De Yu",
-                Unidecode.decode("一条会走路的鱼"));
+                unidecode.decode("一条会走路的鱼"));
     }
 
     /**
@@ -91,7 +69,7 @@ public class UnidecodeTest {
         int b = (int) (9 * Math.pow(16, 3) + 15 * Math.pow(16, 2) + 10 * Math
                 .pow(16, 1)) + 5; // 汉字ASCII码最大值
         for (int i = a; i <= b; i++) {
-            assertNotEquals("不是[开头", "[", Unidecode.decode((char) i + "")
+            assertNotEquals("不是[开头", "[", unidecode.decode((char) i + "")
                     .charAt(0));
         }
     }
@@ -119,7 +97,7 @@ public class UnidecodeTest {
      */
     @Test
     public void testIssues2() {
-        assertEquals("", Unidecode.decode("😜"));
-        assertEquals("H", Unidecode.decode("Ｈ"));
+        assertEquals("", unidecode.decode("😜"));
+        assertEquals("H", unidecode.decode("Ｈ"));
     }
 }

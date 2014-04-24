@@ -7,50 +7,82 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * <p>
- * Transliterate Unicode string to a valid 7-bit ASCII String.
- * </p>
+ * Transliterate Unicode string to a valid 7-bit or 8-bit string with
+ * characters from the specified charset.
  *
- * @see <a href="https://pypi.python.org/pypi/Unidecode">Python`s Unidecode</a>
- * @see <a href="https://github.com/xuender/unidecode">Unidecode at
- *      github.com</a>
+ * @see <a href="https://pypi.python.org/pypi/Unidecode">Python's Unidecode</a>
+
  * @author <a href="mailto:xuender@gmail.com">ender</a>
+ * @author Jakub Jirutka <jakub@jirutka.cz></jakub@jirutka.cz>
  */
-public final class Unidecode {
+public class Unidecode {
+
+    private static final String
+            PREFIX = "/cz/jirutka/unidecode/",
+            ASCII = PREFIX + "ascii",
+            LATIN2 = PREFIX + "latin2";
+
     /**
      * Array to cache already loaded maps.
      */
-    private static final String[][] CACHE = new String[256][];
+    private final String[][] cache = new String[256][];
 
     /**
-     * Transliterate an Unicode object into an ASCII string.
+     * Resource paths where to look for mapping files.
+     */
+    private final String[] mapLookupPaths;
+
+
+    private Unidecode(String[] mapLookupPaths) {
+        this.mapLookupPaths = mapLookupPaths;
+    }
+
+    public static Unidecode withCharset(String charset) {
+        final String[] paths;
+
+        switch (charset.toUpperCase()) {
+            case "ISO-8859-2": // next
+            case "LATIN-2"   : paths = new String[]{ LATIN2, ASCII }; break;
+            case "ASCII"     : paths = new String[]{ ASCII }; break;
+            default: throw new IllegalArgumentException("Unknown charset: " + charset);
+        }
+        return new Unidecode(paths);
+    }
+
+
+    /**
+     * Transliterate an Unicode string into an ASCII string.
      *
-     * @param str
-     *            Unicode String to transliterate.
+     * @param str Unicode String to transliterate.
      * @return ASCII string.
      */
-    public static String decode(final String str) {
+    public String decode(String str) {
         if (str == null) {
             return "";
         }
         StringBuilder sb = new StringBuilder();
+
         for (int i = 0; i < str.length(); i++) {
             char c = str.charAt(i);
             int codepoint = str.codePointAt(i);
+
             // Basic ASCII
             if (codepoint < 0x80) {
                 sb.append(c);
                 continue;
             }
             // Characters in Private Use Area and above are ignored
-            if (codepoint > 0xffff)
+            if (codepoint > 0xffff) {
                 continue;
-            int section = codepoint >> 8; // Chop off the last two hex digits
+            }
+            int section = codepoint >> 8;   // Chop off the last two hex digits
             int position = codepoint % 256; // Last two hex digits
+
             String[] table = getCache(section);
             if (table != null && table.length > position) {
                 sb.append(table[position]);
@@ -59,33 +91,54 @@ public final class Unidecode {
         return sb.toString().trim();
     }
 
-    private static String[] getCache(int section) {
-        String[] ret = CACHE[section];
+    /**
+     * Transliterate Unicode string to a initials.
+     *
+     * @param str Unicode string to transliterate.
+     * @return String initials.
+     */
+    public String toInitials(String str) {
+
+        if (str == null) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+
+        Pattern p = Pattern.compile("^\\w|\\s+\\w");
+        Matcher m = p.matcher(decode(str));
+
+        while (m.find()) {
+            sb.append(m.group().replaceAll(" ", ""));
+        }
+        return sb.toString();
+    }
+
+
+    private String[] getCache(int section) {
+
+        String[] ret = cache[section];
+
         if (ret == null) {
-            InputStream inStream = null;
-            try {
-                inStream = Unidecode.class.getResourceAsStream(String.format(
-                        "/cz/jirutka/unidecode/ascii/X%03x", section));
-                BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(inStream));
-                String line = null;
+            URL resource = getMapResource(section);
+            if (resource == null) {
+                return null;
+            }
+            try (InputStream inStream = resource.openStream()) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(inStream));
+
                 ret = new String[256];
+
                 int i = 0;
+                String line = null;
                 while ((line = reader.readLine()) != null) {
                     ret[i] = line;
                     i++;
                 }
-                CACHE[section] = ret;
-            } catch (Exception e) {
+                cache[section] = ret;
+
+            } catch (IOException ex) {
                 // No match: ignore this character and carry on.
-                CACHE[section] = new String[] {};
-            } finally {
-                if (inStream != null) {
-                    try {
-                        inStream.close();
-                    } catch (IOException e) {
-                    }
-                }
+                cache[section] = new String[]{};
             }
         } else if (ret.length == 0) {
             return null;
@@ -93,26 +146,16 @@ public final class Unidecode {
         return ret;
     }
 
-    /**
-     * Transliterate Unicode string to a initials.
-     *
-     * @param str
-     *            Unicode String to initials.
-     * @return String initials.
-     */
-    public static String initials(final String str) {
-        if (str == null) {
-            return "";
-        }
-        StringBuilder sb = new StringBuilder();
-        Pattern p = Pattern.compile("^\\w|\\s+\\w");
-        Matcher m = p.matcher(decode(str));
-        while (m.find()) {
-            sb.append(m.group().replaceAll(" ", ""));
-        }
-        return sb.toString();
-    }
+    private URL getMapResource(int section) {
 
-    private Unidecode() {
+        String fileName = String.format("X%03x", section);
+
+        for (String path : mapLookupPaths) {
+            URL resource = getClass().getResource(path + '/' + fileName);
+            if (resource != null) {
+                return resource;
+            }
+        }
+        return null;
     }
 }
