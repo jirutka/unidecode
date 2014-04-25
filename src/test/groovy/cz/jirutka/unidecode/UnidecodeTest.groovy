@@ -24,15 +24,15 @@ class UnidecodeTest extends Specification {
 
     def udAscii = Unidecode.withCharset('ASCII')
     def udLatin2 = Unidecode.withCharset('ISO-8859-2')
-    
-    
+
+
     def 'handle null and empty string'() {
         expect:
             udAscii.decode(input) == ''
         where:
             input << [null, '']
     }
-    
+
     def 'convert example text to ASCII: #input'() {
         expect:
             udAscii.decode(input) == expected
@@ -48,7 +48,7 @@ class UnidecodeTest extends Specification {
             'あみだにょらい'                               | 'amidaniyorai'
             '一条会走路的鱼'                               | 'Yi Tiao Hui Zou Lu De Yu'
     }
-    
+
     def 'convert quotation marks to ASCII: #desc'() {
         expect:
             udAscii.decode(input) == expected
@@ -60,7 +60,7 @@ class UnidecodeTest extends Specification {
             '‘’'  | "''"     | 'english single'
             '»«'  | '>><<'   | 'french'
     }
-    
+
     def 'convert hyphens/dashes to ASCII: #desc'() {
         expect:
             udAscii.decode(input) == expected
@@ -74,7 +74,7 @@ class UnidecodeTest extends Specification {
             '—'   | '--'     | 'em-dash'
             '―'   | '--'     | 'horizontal bar'
     }
-    
+
     def 'convert ellipsis to ASCII: #desc'() {
         expect:
             udAscii.decode(input) == expected
@@ -83,7 +83,7 @@ class UnidecodeTest extends Specification {
             '…'   | '...'    | 'normal'
             '…'   | '...'    | 'precomposed'
     }
-    
+
     def 'convert math symbols to ASCII: #desc'() {
         expect:
             udAscii.decode(input) == expected
@@ -92,7 +92,7 @@ class UnidecodeTest extends Specification {
             '≠'   | '!='     | 'not equal'
             '≥'   | '>='     | 'greater than or equal'
             '≤'   | '<='     | 'less than or equal'
-            '÷'   | '/'      | 'obelus' 
+            '÷'   | '/'      | 'obelus'
     }
 
 
@@ -105,7 +105,7 @@ class UnidecodeTest extends Specification {
                 '"Fix, Schwyz!" quäkt Jürgen blöd vom Paß'
             ]
     }
-    
+
     def 'preserve some special chars in Latin-2: #desc'() {
         expect:
             udLatin2.decode(input) == input
@@ -119,8 +119,8 @@ class UnidecodeTest extends Specification {
             '÷'   | 'obelus'
             // this is not complete, just some common examples
     }
-    
-    
+
+
     def 'convert to initials in ASCII'() {
         expect:
             udAscii.toInitials(input) == expected
@@ -134,7 +134,7 @@ class UnidecodeTest extends Specification {
             'あみだにょらい'                         | 'a'
             '小小姑娘\n清早起床\n\r提着花篮\t上市场。'  | 'XXGN\nQZQC\n\rTZHL\tSSC'
     }
-    
+
     def 'section out of cacheable area: #input'() {
         expect:
             udAscii.decode(input) == expected
