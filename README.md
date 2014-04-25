@@ -4,9 +4,12 @@ Unidecode
 [![Coverage Status](https://img.shields.io/coveralls/jirutka/unidecode.svg)](https://coveralls.io/r/jirutka/unidecode)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/cz.jirutka.unidecode/unidecode/badge.svg)](https://maven-badges.herokuapp.com/maven-central/cz.jirutka.unidecode/unidecode)
 
-Unidecode is a Java port of the [Text::Unidecode](http://search.cpan.org/~sburke/Text-Unidecode/lib/Text/Unidecode.pm)
-from Perl that solves transliteration of an Unicode text to US-ASCII. However, this implementation is not limited only
-to ASCII characters, currently supports also ISO-8859-2 (aka Latin 2).
+Unidecode is a Java port of Perl library [Text::Unidecode] that solves transliteration of an Unicode text to US-ASCII.
+This implementation is not limited only to ASCII characters, currently supports also ISO-8859-2 (aka Latin 2) and can
+be easily extended to more charsets (contributions are welcome).
+
+Please note that this is just a quick and dirty method of transliteration, **it’s not a silver bullet!** Read a detailed
+[description][Text::Unidecode] of it’s limitations from the original Text::Unidecode by Sean M. Burke.
 
 
 How to Use
@@ -22,6 +25,9 @@ unidecode.decode("České „uvozovky“");
 
 unidecode.decode("42 ≥ 24");
 >>> 42 >= 24
+
+unidecode.decode("em-dash — is not in ASCII");
+>>> em-dash -- is not in ASCII
 
 unidecode.decode("南无阿弥陀佛");
 >>> Nan Wu A Mi Tuo Fo
@@ -99,3 +105,9 @@ License
 -------
 
 This project is licensed under [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0.html).
+
+Character transliteration tables used in this project are converted (and slightly modified) from the tables provided in
+the Perl library [Text::Unidecode] by Sean M. Burke and are distributed under the Perl license.
+
+
+[Text::Unidecode]: http://search.cpan.org/~sburke/Text-Unidecode/lib/Text/Unidecode.pm
