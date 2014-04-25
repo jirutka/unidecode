@@ -16,6 +16,9 @@
  */
 package cz.jirutka.unidecode;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,6 +26,8 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static java.lang.String.format;
 
 /**
  * Transliterates an Unicode string into the specified narrower charset.
@@ -33,6 +38,8 @@ import java.util.regex.Pattern;
  *     Description of the used transliterization method</a>
  */
 public class Unidecode {
+
+    private static final Logger LOG = LoggerFactory.getLogger(Unidecode.class);
 
     private static final String
             PREFIX = "/cz/jirutka/unidecode/",
@@ -152,7 +159,7 @@ public class Unidecode {
      */
     protected URL resolveCharsTableFile(int block) {
 
-        String fileName = String.format("X%03x", block);
+        String fileName = format("X%03x", block);
 
         for (String path : tablesLookupPaths) {
             URL resource = getClass().getResource(path + '/' + fileName);
@@ -192,6 +199,7 @@ public class Unidecode {
         URL file = resolveCharsTableFile(block);
 
         if (file == null) {
+            LOG.info("Missing chars table for block: {}", format("%03x", block));
             return new String[0];
         }
         try (InputStream is = file.openStream()) {
@@ -208,6 +216,7 @@ public class Unidecode {
             return table;
 
         } catch (IOException ex) {
+            LOG.warn("Failed to load chars table from file: {}", file, ex);
             return new String[0];
         }
     }
