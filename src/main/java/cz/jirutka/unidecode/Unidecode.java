@@ -25,10 +25,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Transliterate Unicode string to a valid 7-bit or 8-bit string with
- * characters from the specified charset.
+ * Transliterates an Unicode string into the specified narrower charset.
  *
- * @see <a href="https://pypi.python.org/pypi/Unidecode">Python's Unidecode</a>
+ * <p>This class is thread-safe.</p>
+ *
+ * @see <a href="http://search.cpan.org/~sburke/Text-Unidecode/lib/Text/Unidecode.pm">
+ *     Description of the used transliterization method</a>
  */
 public class Unidecode {
 
@@ -38,38 +40,60 @@ public class Unidecode {
             LATIN2 = PREFIX + "latin2";
 
     /**
-     * Array to cache already loaded maps.
+     * Array to cache already loaded character tables.
      */
     private final String[][] cache = new String[256][];
 
     /**
-     * Resource paths where to look for mapping files.
+     * Resource paths where to look for character table files.
      */
-    private final String[] mapLookupPaths;
+    private final String[] tablesLookupPaths;
 
 
-    private Unidecode(String[] mapLookupPaths) {
-        this.mapLookupPaths = mapLookupPaths;
+    protected Unidecode(String[] tablesLookupPaths) {
+        this.tablesLookupPaths = tablesLookupPaths;
     }
 
+    /**
+     * Creates a new instance of {@code Unicode} that transliterates Unicode
+     * characters to characters that are available in the specified charset.
+     *
+     * @param charset
+     * @throws IllegalArgumentException if the charset is not supported.
+     */
     public static Unidecode withCharset(String charset) {
         final String[] paths;
 
         switch (charset.toUpperCase()) {
-            case "ISO-8859-2": // next
+            case "ISO-8859-2": // go on
             case "LATIN-2"   : paths = new String[]{ LATIN2, ASCII }; break;
+            case "US-ASCII"  : // go on
             case "ASCII"     : paths = new String[]{ ASCII }; break;
-            default: throw new IllegalArgumentException("Unknown charset: " + charset);
+            default: throw new IllegalArgumentException("Unsupported charset: " + charset);
         }
         return new Unidecode(paths);
     }
 
 
     /**
-     * Transliterate an Unicode string into an ASCII string.
+     * Transliterates the given Unicode string into the specified charset, i.e.
+     * substitute characters, that are not defined in the target charset, with
+     * kind of "similar" (or <tt>[?]</tt> when no replacement is known) from
+     * the target charset.
      *
-     * @param str Unicode String to transliterate.
-     * @return ASCII string.
+     * <p>Characters from the private area (code point &gt; <tt>0xffff</tt>)
+     * are always ignored. Characters from the ASCII area (code point &lt;
+     * <tt>0x80</tt>) are always passed without a change. Leading and trailing
+     * spaces are removed.</p>
+     *
+     * <p>This method does not change an actual <i>encoding</i> of the string,
+     * it returns a plain {@link String} that is always encoded in UTF-8.</p>
+     *
+     * @param str The string to transliterate (may be <tt>null</tt>).
+     * @return A transliterated string.
+     *
+     * @see <a href="http://search.cpan.org/~sburke/Text-Unidecode/lib/Text/Unidecode.pm">
+     *     Description of the used transliterization method</a>
      */
     public String decode(String str) {
         if (str == null) {
@@ -79,30 +103,24 @@ public class Unidecode {
 
         for (int i = 0; i < str.length(); i++) {
             char c = str.charAt(i);
-            int codepoint = str.codePointAt(i);
+            int codePoint = str.codePointAt(i);
 
-            // Basic ASCII
-            if (codepoint < 0x80) {
+            // basic ASCII, don't change
+            if (codePoint < 0x80) {
                 sb.append(c);
                 continue;
             }
-            // Characters in Private Use Area and above are ignored
-            if (codepoint > 0xffff) {
+            // characters in the Private Use Area and above are ignored
+            if (codePoint > 0xffff) {
                 continue;
             }
-            int section = codepoint >> 8;   // Chop off the last two hex digits
-            int position = codepoint % 256; // Last two hex digits
-
-            String[] table = getCache(section);
-            if (table != null && table.length > position) {
-                sb.append(table[position]);
-            }
+            sb.append(substituteChar(codePoint));
         }
         return sb.toString().trim();
     }
 
     /**
-     * Transliterate Unicode string to a initials.
+     * Transliterate Unicode string to an initials.
      *
      * @param str Unicode string to transliterate.
      * @return String initials.
@@ -124,48 +142,72 @@ public class Unidecode {
     }
 
 
-    private String[] getCache(int section) {
+    /**
+     * @param block The first two bytes of the character's code in Unicode,
+     *              e.g. <tt>0x5f</tt> for character <tt>U+5f25</tt>.
+     * @return URL of the file that contains a mapping for Unicode characters
+     *         in the specified block. Line numbers corresponds to the last two
+     *         bytes of the character's code in Unicode.
+     */
+    protected URL resolveCharsTableFile(int block) {
 
-        String[] ret = cache[section];
+        String fileName = String.format("X%03x", block);
 
-        if (ret == null) {
-            URL resource = getMapResource(section);
-            if (resource == null) {
-                return null;
-            }
-            try (InputStream inStream = resource.openStream()) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(inStream));
-
-                ret = new String[256];
-
-                int i = 0;
-                String line = null;
-                while ((line = reader.readLine()) != null) {
-                    ret[i] = line;
-                    i++;
-                }
-                cache[section] = ret;
-
-            } catch (IOException ex) {
-                // No match: ignore this character and carry on.
-                cache[section] = new String[]{};
-            }
-        } else if (ret.length == 0) {
-            return null;
-        }
-        return ret;
-    }
-
-    private URL getMapResource(int section) {
-
-        String fileName = String.format("X%03x", section);
-
-        for (String path : mapLookupPaths) {
+        for (String path : tablesLookupPaths) {
             URL resource = getClass().getResource(path + '/' + fileName);
             if (resource != null) {
                 return resource;
             }
         }
         return null;
+    }
+
+    /**
+     * @param codePoint Unicode codepoint of the character.
+     * @return A substitution (from the target charset) for the given character.
+     */
+    private String substituteChar(int codePoint) {
+
+        int section = codePoint >> 8;   // Chop off the last two hex digits
+        int position = codePoint % 256; // Last two hex digits
+
+        String[] table = getCachedCharsTable(section);
+        if (table.length > position) {
+            return table[position];
+        }
+        return "";
+    }
+
+    private synchronized String[] getCachedCharsTable(int block) {
+
+        if (block < cache.length && cache[block] == null) {
+            cache[block] = loadCharsTable(block);
+        }
+        return cache[block];
+    }
+
+    private String[] loadCharsTable(int block) {
+
+        URL file = resolveCharsTableFile(block);
+
+        if (file == null) {
+            return new String[0];
+        }
+        try (InputStream is = file.openStream()) {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+
+            String[] table = new String[256];
+
+            int i = 0;
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                table[i] = line;
+                i++;
+            }
+            return table;
+
+        } catch (IOException ex) {
+            return new String[0];
+        }
     }
 }
