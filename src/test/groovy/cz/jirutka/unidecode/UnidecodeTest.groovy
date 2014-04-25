@@ -22,8 +22,8 @@ import spock.lang.Unroll
 @Unroll
 class UnidecodeTest extends Specification {
 
-    def udAscii = Unidecode.withCharset('ASCII')
-    def udLatin2 = Unidecode.withCharset('ISO-8859-2')
+    def udAscii = Unidecode.toAscii()
+    def udLatin2 = Unidecode.toLatin2()
 
 
     def 'handle null and empty string'() {

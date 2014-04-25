@@ -54,24 +54,25 @@ public class Unidecode {
         this.tablesLookupPaths = tablesLookupPaths;
     }
 
-    /**
-     * Creates a new instance of {@code Unicode} that transliterates Unicode
-     * characters to characters that are available in the specified charset.
-     *
-     * @param charset
-     * @throws IllegalArgumentException if the charset is not supported.
-     */
-    public static Unidecode withCharset(String charset) {
-        final String[] paths;
 
-        switch (charset.toUpperCase()) {
-            case "ISO-8859-2": // go on
-            case "LATIN-2"   : paths = new String[]{ LATIN2, ASCII }; break;
-            case "US-ASCII"  : // go on
-            case "ASCII"     : paths = new String[]{ ASCII }; break;
-            default: throw new IllegalArgumentException("Unsupported charset: " + charset);
-        }
-        return new Unidecode(paths);
+    /**
+     * Creates a new instance of {@code Unidecode} that transliterates Unicode
+     * characters to characters that are available in US-ASCII.
+     *
+     * @see <a href="https://en.wikipedia.org/wiki/ASCII">ASCII</a>
+     */
+    public static Unidecode toAscii() {
+        return new Unidecode(new String[]{ ASCII });
+    }
+
+    /**
+     * Creates a new instance of {@code Unidecode} that transliterates Unicode
+     * characters to characters that are available in ISO 8859-2 (aka Latin-2).
+     *
+     * @see <a href="https://en.wikipedia.org/wiki/ISO/IEC_8859-2">ISO 8859-2</a>
+     */
+    public static Unidecode toLatin2() {
+        return new Unidecode(new String[]{ LATIN2, ASCII });
     }
 
 

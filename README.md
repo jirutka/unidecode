@@ -15,7 +15,7 @@ How to Use
 ### Transliterate to ASCII
 
 ```java
-Unidecode unidecode = Unidecode.withCharset("ASCII");
+Unidecode unidecode = Unidecode.toAscii();
 
 unidecode.decode("České „uvozovky“");
 >>> Ceske "uvozovky"
@@ -33,7 +33,7 @@ unidecode.decode("あみだにょらい");
 ### Transliterate to ISO-8859-2
 
 ```java
-Unidecode unidecode = Unidecode.withCharset("ISO-8859-2");
+Unidecode unidecode = Unidecode.toLatin2();
 
 unidecode.decode("České „uvozovky“");
 >>> České "uvozovky"
@@ -42,7 +42,7 @@ unidecode.decode("České „uvozovky“");
 ### Initials
 
 ```java
-Unidecode unidecode = Unidecode.withCharset("ASCII");
+Unidecode unidecode = Unidecode.toAscii();
 
 unidecode.initials("南无阿弥陀佛");
 >>> NWAMTF
@@ -92,7 +92,7 @@ Credits
 -------
 
 This project is a fork of the [unidecode](https://github.com/xuender/unidecode) written by 徐晨阳
-([xuender](https://github.com/xuender)). 
+([xuender](https://github.com/xuender)).
 
 
 License
