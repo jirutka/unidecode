@@ -120,6 +120,14 @@ class UnidecodeTest extends Specification {
             // this is not complete, just some common examples
     }
 
+    def "convert character we don't have chars table for to [?]"() {
+        expect:
+            udAscii.decode(input) == expected
+        where:
+            input | expected
+           '😜'  | Unidecode.UNKNOWN_CHAR
+    }
+
 
     def 'convert to initials in ASCII'() {
         expect:
@@ -133,14 +141,5 @@ class UnidecodeTest extends Specification {
             'Κνωσός'                               | 'K'
             'あみだにょらい'                         | 'a'
             '小小姑娘\n清早起床\n\r提着花篮\t上市场。'  | 'XXGN\nQZQC\n\rTZHL\tSSC'
-    }
-
-    def 'section out of cacheable area: #input'() {
-        expect:
-            udAscii.decode(input) == expected
-        where:
-            input | expected
-            '😜'  | ''
-            'Ｈ'  | 'H'
     }
 }

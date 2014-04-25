@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,6 +46,11 @@ public class Unidecode {
             PREFIX = "/cz/jirutka/unidecode/",
             ASCII = PREFIX + "ascii",
             LATIN2 = PREFIX + "latin2";
+
+    /**
+     * Placeholder for an unknown character.
+     */
+    public static final String UNKNOWN_CHAR = "[?]";
 
     /**
      * Array to cache already loaded character tables.
@@ -183,7 +189,7 @@ public class Unidecode {
         if (table.length > position) {
             return table[position];
         }
-        return "";
+        return UNKNOWN_CHAR;
     }
 
     private synchronized String[] getCachedCharsTable(int block) {
@@ -200,7 +206,7 @@ public class Unidecode {
 
         if (file == null) {
             LOG.info("Missing chars table for block: {}", format("%03x", block));
-            return new String[0];
+            return unknownCharsTable();
         }
         try (InputStream is = file.openStream()) {
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
@@ -217,7 +223,14 @@ public class Unidecode {
 
         } catch (IOException ex) {
             LOG.warn("Failed to load chars table from file: {}", file, ex);
-            return new String[0];
+            return unknownCharsTable();
         }
+    }
+
+    private static String[] unknownCharsTable() {
+        String[] table = new String[256];
+        Arrays.fill(table, UNKNOWN_CHAR);
+
+        return table;
     }
 }
