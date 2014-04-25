@@ -15,11 +15,11 @@
 
     <groupId>cz.jirutka.unidecode</groupId>
     <artifactId>unidecode</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <packaging>jar</packaging>
 
     <name>unidecode</name>
-    <description>Transliteration from Unicode to ASCII or ISO 8859-2.</description>
+    <description>Simple transliteration from Unicode to ASCII and ISO 8859-2.</description>
     <url>http://github.com/jirutka/unidecode</url>
 
     <developers>

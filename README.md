@@ -67,7 +67,7 @@ Released versions are available in The Central Repository. Just add this artifac
 <dependency>
     <groupId>cz.jirutka.unidecode</groupId>
     <artifactId>unidecode</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
 </dependency>
 ```
 
